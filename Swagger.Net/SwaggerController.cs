@@ -4,41 +4,59 @@ using System.Net.Http;
 using System.Reflection;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Controllers;
+using System.Web.Http.Description;
+using Swagger.Net.Models;
+using System.Linq;
 
 namespace Swagger.Net
 {
     public class SwaggerController : ApiController
     {
+        private readonly IEnumerable<ApiDescription> _apiDescriptions;
+        private readonly XmlCommentDocumentationProvider _docProvider;
+
+        public SwaggerController()
+        {
+            _apiDescriptions = GlobalConfiguration.Configuration.Services.GetApiExplorer().ApiDescriptions
+                .Where(s => !s.ActionDescriptor.ControllerDescriptor.ControllerName.Equals(Constants.Swagger, StringComparison.InvariantCultureIgnoreCase));
+            _docProvider =
+                (XmlCommentDocumentationProvider) GlobalConfiguration.Configuration.Services.GetDocumentationProvider();
+        }
+
         /// <summary>
         /// Get the resource description of the api for swagger documentation
         /// </summary>
         /// <remarks>It is very convenient to have this information available for generating clients. This is the entry point for the swagger UI
         /// </remarks>
         /// <returns>JSON document representing structure of API</returns>
-        public HttpResponseMessage Get()
+        public ResourceListing Get()
         {
-            var docProvider = (XmlCommentDocumentationProvider)GlobalConfiguration.Configuration.Services.GetDocumentationProvider();
+            var controllers = _apiDescriptions.Select(a => a.ActionDescriptor.ControllerDescriptor)
+                .Distinct();
+            return new ResourceListing()
+                {
+                    Apis = controllers.Select(controller => new Api()
+                    {
+                        //TODO: Fix path with proper routing
+                        Path = "/getapi/" + controller.ControllerName,
+                        Description = "controller.Documentation"
+                    })
+                };
+        }
 
-            ResourceListing r = SwaggerGen.CreateResourceListing(ControllerContext);
-            List<string> uniqueControllers = new List<string>();
+        public ApiDeclaration GetApi(string controllerName)
+        {
+            var r = SwaggerGen.CreateApiDeclaration(ControllerContext);
+            var actions = _apiDescriptions.Where(
+                    a => a.ActionDescriptor.ControllerDescriptor.ControllerName
+                            .Equals(controllerName,StringComparison.InvariantCultureIgnoreCase)
+                );
 
-            foreach (var api in GlobalConfiguration.Configuration.Services.GetApiExplorer().ApiDescriptions)
-            {
-                string controllerName = api.ActionDescriptor.ControllerDescriptor.ControllerName;
-                if (uniqueControllers.Contains(controllerName) ||
-                      controllerName.ToUpper().Equals(SwaggerGen.SWAGGER.ToUpper())) continue;
+            r.Apis = actions.Select(api => SwaggerGen.CreateApi(api, _docProvider));
+            r.Models = ModelGen.CreateModels(actions, _docProvider);
 
-                uniqueControllers.Add(controllerName);
-
-                ResourceApi rApi = SwaggerGen.CreateResourceApi(api);
-                r.apis.Add(rApi);
-            }
-
-            HttpResponseMessage resp = new HttpResponseMessage();
-
-            resp.Content = new ObjectContent<ResourceListing>(r, ControllerContext.Configuration.Formatters.JsonFormatter);            
-            
-            return resp;
+            return r;
         }
     }
 }

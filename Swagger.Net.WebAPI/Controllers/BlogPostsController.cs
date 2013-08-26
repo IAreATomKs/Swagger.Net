@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Swagger.Net.WebApi.Models;
 
 namespace Swagger.Net.WebApi.Controllers
 {
@@ -15,15 +16,21 @@ namespace Swagger.Net.WebApi.Controllers
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/blogposts/5
-        public string Get(int id)
+        /// <summary>
+        /// Gets a blog post
+        /// </summary>
+        /// <param name="id">Id of the blogpost</param>
+        /// <param name="cheese">nom nom</param>
+        /// <returns></returns>
+        public string Get(int id, bool isABool, string cheese = "nom nom")
         {
             return "value";
         }
 
         // POST api/blogposts
-        public void Post([FromBody]string value)
+        public BlogPostRequest Post([FromBody] BlogPostRequest request)
         {
+            return request;
         }
 
         // PUT api/blogposts/5

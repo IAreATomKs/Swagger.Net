@@ -16,17 +16,15 @@ namespace Swagger.Net.WebApi.App_Start
         public static void PreStart()
         {
             RouteTable.Routes.MapHttpRoute(
-                name: "SwaggerApi",
-                routeTemplate: "api/docs/{controller}",
-                defaults: new { swagger = true }
-            );
+            name: Constants.Swagger,
+            routeTemplate: "api/docs/{action}/{controllerName}",
+            defaults: new { controller = Constants.Swagger, action = "get", controllerName = RouteParameter.Optional }
+);
         }
 
         public static void PostStart()
         {
             var config = GlobalConfiguration.Configuration;
-
-            config.Filters.Add(new SwaggerActionFilter());
 
             try
             {

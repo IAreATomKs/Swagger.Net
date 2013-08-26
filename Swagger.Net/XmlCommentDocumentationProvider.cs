@@ -15,19 +15,33 @@ namespace Swagger.Net
     /// </summary>
     public class XmlCommentDocumentationProvider : IDocumentationProvider
     {
-        XPathNavigator _documentNavigator;
-        private const string _methodExpression = "/doc/members/member[@name='M:{0}']";
-        private static Regex nullableTypeNameRegex = new Regex(@"(.*\.Nullable)" + Regex.Escape("`1[[") + "([^,]*),.*");
+        readonly XPathNavigator _documentNavigator;
+        private const string MethodExpression = "/doc/members/member[@name='M:{0}']";
+        private static readonly Regex NullableTypeNameRegex = new Regex(@"(.*\.Nullable)" + Regex.Escape("`1[[") + "([^,]*),.*");
 
         public XmlCommentDocumentationProvider(string documentPath)
         {
-            XPathDocument xpath = new XPathDocument(documentPath);
+            var xpath = new XPathDocument(documentPath);
             _documentNavigator = xpath.CreateNavigator();
         }
 
+        public virtual string GetDocumentation(HttpActionDescriptor actionDescriptor)
+        {
+            var memberNode = GetMemberNode(actionDescriptor);
+            if (memberNode != null)
+            {
+                var summaryNode = memberNode.SelectSingleNode("summary");
+                if (summaryNode != null)
+                {
+                    return summaryNode.Value.Trim();
+                }
+            }
+
+            return "No Documentation Found.";
+        }
         public virtual string GetDocumentation(HttpParameterDescriptor parameterDescriptor)
         {
-            ReflectedHttpParameterDescriptor reflectedParameterDescriptor = parameterDescriptor as ReflectedHttpParameterDescriptor;
+            var reflectedParameterDescriptor = parameterDescriptor as ReflectedHttpParameterDescriptor;
             if (reflectedParameterDescriptor != null)
             {
                 XPathNavigator memberNode = GetMemberNode(reflectedParameterDescriptor.ActionDescriptor);
@@ -47,21 +61,15 @@ namespace Swagger.Net
 
         public virtual bool GetRequired(HttpParameterDescriptor parameterDescriptor)
         {
-            ReflectedHttpParameterDescriptor reflectedParameterDescriptor = parameterDescriptor as ReflectedHttpParameterDescriptor;
-            if (reflectedParameterDescriptor != null)
-            {
-                return !reflectedParameterDescriptor.ParameterInfo.IsOptional;
-            }
-
-            return true;
+            return !parameterDescriptor.IsOptional;
         }
 
-        public virtual string GetDocumentation(HttpActionDescriptor actionDescriptor)
+        public virtual string GetOperationNotes(HttpActionDescriptor actionDescriptor)
         {
-            XPathNavigator memberNode = GetMemberNode(actionDescriptor);
+            var memberNode = GetMemberNode(actionDescriptor);
             if (memberNode != null)
             {
-                XPathNavigator summaryNode = memberNode.SelectSingleNode("summary");
+                var summaryNode = memberNode.SelectSingleNode("remarks");
                 if (summaryNode != null)
                 {
                     return summaryNode.Value.Trim();
@@ -71,64 +79,18 @@ namespace Swagger.Net
             return "No Documentation Found.";
         }
 
-        public virtual string GetNotes(HttpActionDescriptor actionDescriptor)
+        public virtual string GetOperationNickname(ApiDescription apiDescription)
         {
-            XPathNavigator memberNode = GetMemberNode(actionDescriptor);
-            if (memberNode != null)
-            {
-                XPathNavigator summaryNode = memberNode.SelectSingleNode("remarks");
-                if (summaryNode != null)
-                {
-                    return summaryNode.Value.Trim();
-                }
-            }
-
-            return "No Documentation Found.";
-        }
-
-        public virtual string GetResponseClass(HttpActionDescriptor actionDescriptor)
-        {
-            ReflectedHttpActionDescriptor reflectedActionDescriptor = actionDescriptor as ReflectedHttpActionDescriptor;
-            if (reflectedActionDescriptor != null)
-            {
-                if (reflectedActionDescriptor.MethodInfo.ReturnType.IsGenericType)
-                {
-                    StringBuilder sb = new StringBuilder(reflectedActionDescriptor.MethodInfo.ReturnParameter.ParameterType.Name);
-                    sb.Append("<");
-                    Type[] types = reflectedActionDescriptor.MethodInfo.ReturnParameter.ParameterType.GetGenericArguments();
-                    for(int i = 0; i < types.Length; i++)
-                    {
-                        sb.Append(types[i].Name);
-                        if(i != (types.Length - 1)) sb.Append(", ");
-                    }
-                    sb.Append(">");
-                    return sb.Replace("`1","").ToString();
-                }
-                else
-                    return reflectedActionDescriptor.MethodInfo.ReturnType.Name;
-            }
-
-            return "void";
-        }
-
-        public virtual string GetNickname(HttpActionDescriptor actionDescriptor)
-        {
-            ReflectedHttpActionDescriptor reflectedActionDescriptor = actionDescriptor as ReflectedHttpActionDescriptor;
-            if (reflectedActionDescriptor != null)
-            {
-                return reflectedActionDescriptor.MethodInfo.Name;
-            }
-
-            return "NicknameNotFound";
+            return apiDescription.ActionDescriptor.ActionName + String.Join("-",apiDescription.ParameterDescriptions.Select( pd => pd.Name));
         }
 
         private XPathNavigator GetMemberNode(HttpActionDescriptor actionDescriptor)
         {
-            ReflectedHttpActionDescriptor reflectedActionDescriptor = actionDescriptor as ReflectedHttpActionDescriptor;
+            var reflectedActionDescriptor = actionDescriptor as ReflectedHttpActionDescriptor;
             if (reflectedActionDescriptor != null)
             {
-                string selectExpression = string.Format(_methodExpression, GetMemberName(reflectedActionDescriptor.MethodInfo));
-                XPathNavigator node = _documentNavigator.SelectSingleNode(selectExpression);
+                var selectExpression = string.Format(MethodExpression, GetMemberName(reflectedActionDescriptor.MethodInfo));
+                var node = _documentNavigator.SelectSingleNode(selectExpression);
                 if (node != null)
                 {
                     return node;
@@ -140,11 +102,11 @@ namespace Swagger.Net
 
         private static string GetMemberName(MethodInfo method)
         {
-            string name = string.Format("{0}.{1}", method.DeclaringType.FullName, method.Name);
+            var name = string.Format("{0}.{1}", method.DeclaringType.FullName, method.Name);
             var parameters = method.GetParameters();
             if (parameters.Length != 0)
             {
-                string[] parameterTypeNames = parameters.Select(param => ProcessTypeName(param.ParameterType.FullName)).ToArray();
+                var parameterTypeNames = parameters.Select(param => ProcessTypeName(param.ParameterType.FullName)).ToArray();
                 name += string.Format("({0})", string.Join(",", parameterTypeNames));
             }
 
@@ -154,7 +116,7 @@ namespace Swagger.Net
         private static string ProcessTypeName(string typeName)
         {
             //handle nullable
-            var result = nullableTypeNameRegex.Match(typeName);
+            var result = NullableTypeNameRegex.Match(typeName);
             if (result.Success)
             {
                 return string.Format("{0}{{{1}}}", result.Groups[1].Value, result.Groups[2].Value);

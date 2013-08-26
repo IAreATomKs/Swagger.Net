@@ -12,6 +12,9 @@ namespace Swagger.Net.WebApi.Controllers
         /// <summary>
         /// Get all of the Tags
         /// </summary>
+        /// <remarks>
+        /// Some extra notes
+        /// </remarks>
         /// <returns></returns>
         public IEnumerable<string> Get()
         {
@@ -23,7 +26,7 @@ namespace Swagger.Net.WebApi.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public string Get(int id)
+        public string Get(byte id)
         {
             return "value";
         }
@@ -41,7 +44,7 @@ namespace Swagger.Net.WebApi.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <param name="value"></param>
-        public void Put(int id, [FromBody]string value)
+        public void Put(IEnumerable<int> id)
         {
         }
 
@@ -49,7 +52,7 @@ namespace Swagger.Net.WebApi.Controllers
         /// Remove a Tag by it's id
         /// </summary>
         /// <param name="id"></param>
-        public void Delete(int id)
+        public void Delete(IEnumerable<int> id)
         {
         }
     }

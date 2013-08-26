@@ -16,7 +16,7 @@ namespace Swagger.Net.WebApi.Controllers
         }
 
         // GET api/values/5
-        public string Get(int id)
+        public string Get(int id, DateTime date)
         {
             return "value";
         }
