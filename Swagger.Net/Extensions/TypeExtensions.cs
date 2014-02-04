@@ -1,29 +1,20 @@
 ﻿using System;
-using System.CodeDom;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Web.Http.Controllers;
-using Swagger.Net.Attributes;
 
-namespace Swagger.Net
+namespace Swagger.Net.Extensions
 {
-    public static class Extensions
+    public static class TypeExtensions
     {
         public static bool IsPrimitive(this Type type)
         {
-            return type.IsPrimitive || type == typeof (Decimal) || type == typeof (String) || type == typeof (DateTime);
+            return type.IsPrimitive || type == typeof(Decimal) || type == typeof(String) || type == typeof(DateTime);
         }
 
         public static bool IsIEnumerable(this Type type)
         {
             return type != typeof(string) && type == typeof(IEnumerable<>);
-        }
-
-        public static bool ShouldSwaggerIgnore(this HttpControllerDescriptor controllerDescriptor)
-        {
-            return controllerDescriptor.ControllerType.HasAttribute(typeof (SwaggerIgnoreAttribute));
         }
 
         public static bool HasAttribute(this Type type, Type attributeType)
@@ -42,7 +33,7 @@ namespace Swagger.Net
                 return "Array";
             }
             //TODO: Add other format for guids
-            if (type == typeof (string) || type == typeof(Guid))
+            if (type == typeof(string) || type == typeof(Guid))
             {
                 return "string";
             }
@@ -54,23 +45,23 @@ namespace Swagger.Net
             {
                 return "long";
             }
-            if (type == typeof (float))
+            if (type == typeof(float))
             {
                 return "float";
             }
-            if (type == typeof (double) || type == typeof(decimal))
+            if (type == typeof(double) || type == typeof(decimal))
             {
                 return "double";
             }
-            if (type == typeof (byte))
+            if (type == typeof(byte))
             {
                 return "byte";
             }
-            if (type == typeof (bool))
+            if (type == typeof(bool))
             {
                 return "boolean";
             }
-            if (type == typeof (DateTime))
+            if (type == typeof(DateTime))
             {
                 return "datetime";
             }

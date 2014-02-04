@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using Newtonsoft.Json;
+using Swagger.Net.Extensions;
 using Swagger.Net.Models;
 
 namespace Swagger.Net
@@ -39,7 +40,7 @@ namespace Swagger.Net
         {
             var rApi = new Api()
             {
-                Path = "/" + api.RelativePath,
+                Path = "/" + api.GetCleanRelativePath(),
                 Description = api.Documentation,
                 Operations = new List<Operation>()
             };
@@ -87,10 +88,9 @@ namespace Swagger.Net
         /// <returns>An operation parameter</returns>
         public static Parameter CreateParameter(ApiDescription api, ApiParameterDescription param, XmlCommentDocumentationProvider docProvider)
         {
-            string paramType = (param.Source.ToString().Equals(Constants.FromUri)) ? Constants.Query : Constants.Body;
             var parameter = new Parameter()
             {
-                ParamType = (paramType == "query" && api.RelativePath.IndexOf("{" + param.Name + "}") > -1) ? Constants.Path : paramType,
+                ParamTypeEnum = param.GetParamType(),
                 Name = param.Name,
                 Description = param.Documentation,
                 Type = param.ParameterDescriptor.ParameterType.GetSwaggerType(),

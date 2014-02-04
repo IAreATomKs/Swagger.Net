@@ -39,6 +39,7 @@ namespace Swagger.Net
 
             return "No Documentation Found.";
         }
+
         public virtual string GetDocumentation(HttpParameterDescriptor parameterDescriptor)
         {
             var reflectedParameterDescriptor = parameterDescriptor as ReflectedHttpParameterDescriptor;

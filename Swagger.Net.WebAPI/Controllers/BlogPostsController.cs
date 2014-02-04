@@ -22,7 +22,7 @@ namespace Swagger.Net.WebApi.Controllers
         /// <param name="id">Id of the blogpost</param>
         /// <param name="cheese">nom nom</param>
         /// <returns></returns>
-        public string Get(int id, bool isABool, string cheese = "nom nom")
+        public string Get(int id, bool isABool = false, string cheese = "nom nom")
         {
             return "value";
         }

@@ -12,7 +12,7 @@ namespace Swagger.Net
         public const string FromUri = "FromUri";
         public const string FromBody = "FromBody";
         public const string Query = "query";
-        public const string Path = "path";
+        public const string Path = "Path";
         public const string Body = "body";
     }
 }

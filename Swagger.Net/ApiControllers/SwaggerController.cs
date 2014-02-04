@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Reflection;
-using System.Web;
+using System.Linq;
 using System.Web.Http;
-using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using Swagger.Net.Attributes;
+using Swagger.Net.Extensions;
 using Swagger.Net.Models;
-using System.Linq;
 
-namespace Swagger.Net
+namespace Swagger.Net.ApiControllers
 {
     [SwaggerIgnore]
     public class SwaggerController : ApiController

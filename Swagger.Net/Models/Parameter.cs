@@ -3,13 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Swagger.Net.Models
 {
     public class Parameter
     {
         [JsonProperty(PropertyName = "paramType")]
-        public string ParamType { get; set; }
+        public string ParamType 
+        {
+            get { return ParamTypeEnum.ToString().ToLower(); }
+        }
+
+        [JsonIgnore]
+        public ParamType ParamTypeEnum { get; set; }
 
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
