@@ -18,7 +18,7 @@ namespace Swagger.Net.Models
         public string Type { get; set; }
 
         [JsonProperty(PropertyName = "parameters")]
-        public List<Parameter> Parameters { get; set; }
+        public IEnumerable<Parameter> Parameters { get; set; }
 
         [JsonProperty(PropertyName = "summary")]
         public string Summary { get; set; }

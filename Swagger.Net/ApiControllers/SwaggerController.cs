@@ -52,7 +52,9 @@ namespace Swagger.Net.ApiControllers
                             .Equals(controllerName,StringComparison.InvariantCultureIgnoreCase)
                 );
 
-            r.Apis = actions.Select(api => SwaggerGen.CreateApi(api, _docProvider));
+            var swaggerGen = new SwaggerGen();
+
+            r.Apis = actions.Select(swaggerGen.CreateApi);
             r.Models = ModelGen.CreateModels(actions, _docProvider);
 
             return r;

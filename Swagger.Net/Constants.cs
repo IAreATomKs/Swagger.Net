@@ -9,10 +9,6 @@ namespace Swagger.Net
     {
         public const string Swagger = "swagger";
         public const string SwaggerVersion = "2.0";
-        public const string FromUri = "FromUri";
-        public const string FromBody = "FromBody";
-        public const string Query = "query";
-        public const string Path = "Path";
-        public const string Body = "body";
+
     }
 }

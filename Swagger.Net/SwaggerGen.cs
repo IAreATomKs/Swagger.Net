@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Web;
+using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using Newtonsoft.Json;
@@ -11,8 +12,15 @@ using Swagger.Net.Models;
 
 namespace Swagger.Net
 {
-    public static class SwaggerGen
+    public class SwaggerGen
     {
+
+        private readonly XmlCommentDocumentationProvider _docProvider;
+        public SwaggerGen()
+        {
+            _docProvider =
+                (XmlCommentDocumentationProvider)GlobalConfiguration.Configuration.Services.GetDocumentationProvider();
+        }
 
         /// <summary>
         /// Create a resource listing
@@ -35,59 +43,35 @@ namespace Swagger.Net
         /// </summary>
         /// <param name="api">Description of the api via the ApiExplorer</param>
         /// <returns>A resource api</returns>
-        public static Api CreateApi(ApiDescription api, XmlCommentDocumentationProvider docProvider)
+        public Api CreateApi(ApiDescription api)
         {
-            var rApi = new Api()
+            return new Api()
             {
                 Path = "/" + api.GetCleanRelativePath(),
                 Description = api.Documentation,
                 Operations = new List<Operation>()
+                {
+                    new Operation()
+                    {
+                        HttpMethod = api.HttpMethod.ToString(),
+                        Nickname = api.GetNickname(),
+                        Type = api.ActionDescriptor.ReturnType.GetSwaggerType(),
+                        Summary = api.Documentation,
+                        Notes = _docProvider.GetOperationNotes(api.ActionDescriptor),
+                        Parameters = api.ParameterDescriptions.Select(CreateParameter)
+                    }
+                }
             };
-
-
-            Operation rApiOperation = CreateOperation(api, docProvider);
-            rApi.Operations.Add(rApiOperation);
-
-            foreach (var param in api.ParameterDescriptions)
-            {
-                Parameter parameter = CreateParameter(api, param, docProvider);
-                rApiOperation.Parameters.Add(parameter);
-            }
-
-            return rApi;
-        }
-
-        /// <summary>
-        /// Creates an api operation
-        /// </summary>
-        /// <param name="api">Description of the api via the ApiExplorer</param>
-        /// <param name="docProvider">Access to the XML docs written in code</param>
-        /// <returns>An api operation</returns>
-        public static Operation CreateOperation(ApiDescription api, XmlCommentDocumentationProvider docProvider)
-        {
-            var rApiOperation = new Operation()
-            {
-                HttpMethod = api.HttpMethod.ToString(),
-                Nickname = api.GetNickname(),
-                Type = api.ActionDescriptor.ReturnType.GetSwaggerType(),
-                Summary = api.Documentation,
-                Notes = docProvider.GetOperationNotes(api.ActionDescriptor),
-                Parameters = new List<Parameter>()
-            };
-
-            return rApiOperation;
         }
 
         /// <summary>
         /// Creates an operation parameter
         /// </summary>
-        /// <param name="api">Description of the api via the ApiExplorer</param>
         /// <param name="param">Description of a parameter on an operation via the ApiExplorer</param>
-        /// <param name="docProvider">Access to the XML docs written in code</param>
         /// <returns>An operation parameter</returns>
-        public static Parameter CreateParameter(ApiDescription api, ApiParameterDescription param, XmlCommentDocumentationProvider docProvider)
+        public Parameter CreateParameter(ApiParameterDescription param)
         {
-            var parameter = new Parameter()
+            return new Parameter()
             {
                 ParamTypeEnum = param.GetParamType(),
                 Name = param.Name,
@@ -96,8 +80,6 @@ namespace Swagger.Net
                 Required = !param.ParameterDescriptor.IsOptional,
                 Items = param.ParameterDescriptor.ParameterType.IsIEnumerable() ? new Items(){Type = "string"} : null 
             };
-
-            return parameter;
         }
     }
 

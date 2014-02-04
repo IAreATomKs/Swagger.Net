@@ -8,6 +8,9 @@ using Swagger.Net.WebApi.Models;
 
 namespace Swagger.Net.WebApi.Controllers
 {
+    /// <summary>
+    /// Controller for getting blogposts
+    /// </summary>
     public class BlogPostsController : ApiController
     {
         // GET api/blogposts
