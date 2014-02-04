@@ -1,9 +1,11 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Http.Controllers;
+using Swagger.Net.Attributes;
 
 namespace Swagger.Net
 {
@@ -19,6 +21,15 @@ namespace Swagger.Net
             return type != typeof(string) && type == typeof(IEnumerable<>);
         }
 
+        public static bool ShouldSwaggerIgnore(this HttpControllerDescriptor controllerDescriptor)
+        {
+            return controllerDescriptor.ControllerType.HasAttribute(typeof (SwaggerIgnoreAttribute));
+        }
+
+        public static bool HasAttribute(this Type type, Type attributeType)
+        {
+            return type.GetCustomAttributes(attributeType, true).Any();
+        }
 
         public static string GetSwaggerType(this Type type)
         {

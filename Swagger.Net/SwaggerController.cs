@@ -6,11 +6,13 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
+using Swagger.Net.Attributes;
 using Swagger.Net.Models;
 using System.Linq;
 
 namespace Swagger.Net
 {
+    [SwaggerIgnore]
     public class SwaggerController : ApiController
     {
         private readonly IEnumerable<ApiDescription> _apiDescriptions;
@@ -19,7 +21,7 @@ namespace Swagger.Net
         public SwaggerController()
         {
             _apiDescriptions = GlobalConfiguration.Configuration.Services.GetApiExplorer().ApiDescriptions
-                .Where(s => !s.ActionDescriptor.ControllerDescriptor.ControllerName.Equals(Constants.Swagger, StringComparison.InvariantCultureIgnoreCase));
+                .Where(s => !s.ActionDescriptor.ControllerDescriptor.ShouldSwaggerIgnore());
             _docProvider =
                 (XmlCommentDocumentationProvider) GlobalConfiguration.Configuration.Services.GetDocumentationProvider();
         }
