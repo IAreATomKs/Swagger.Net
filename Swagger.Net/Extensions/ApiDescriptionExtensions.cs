@@ -11,10 +11,11 @@ namespace Swagger.Net.Extensions
         public static string GetCleanRelativePath(this ApiDescription apiDescription)
         {
             return apiDescription.RelativePath.TruncateFrom("?").ToLower();
-            //return apiDescription.ParameterDescriptions
-            //    .Where(p => p.Source == ApiParameterSource.FromUri)
-            //    .Aggregate(relativePath, (c, p) => c.Replace(string.Format("{0}={{{0}}}", p.Name.ToLower()), ""))
-            //    .TrimEnd('&').RegexReplace(@"\+&","&");
+        }
+
+        public static string GetNickname(this ApiDescription apiDescription)
+        {
+            return apiDescription.ActionDescriptor.ActionName + String.Join("-", apiDescription.ParameterDescriptions.Select(pd => pd.Name));
         }
     }
 }

@@ -35,11 +35,11 @@ namespace Swagger.Net.ApiControllers
                 .Distinct();
             return new ResourceListing()
                 {
-                    Apis = controllers.Select(controller => new Api()
+                    Apis = controllers.Select(c => new Api()
                     {
                         //TODO: Fix path with proper routing
-                        Path = "/getapi/" + controller.ControllerName,
-                        Description = controller.
+                        Path = "/getapi/" + c.ControllerName,
+                        Description = _apiDescriptions.First( a => a.ActionDescriptor.ControllerDescriptor == c).Documentation
                     })
                 };
         }

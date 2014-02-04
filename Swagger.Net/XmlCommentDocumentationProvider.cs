@@ -25,6 +25,8 @@ namespace Swagger.Net
             _documentNavigator = xpath.CreateNavigator();
         }
 
+
+
         public virtual string GetDocumentation(HttpActionDescriptor actionDescriptor)
         {
             var memberNode = GetMemberNode(actionDescriptor);
@@ -60,11 +62,6 @@ namespace Swagger.Net
             return "No Documentation Found.";
         }
 
-        public virtual bool GetRequired(HttpParameterDescriptor parameterDescriptor)
-        {
-            return !parameterDescriptor.IsOptional;
-        }
-
         public virtual string GetOperationNotes(HttpActionDescriptor actionDescriptor)
         {
             var memberNode = GetMemberNode(actionDescriptor);
@@ -80,10 +77,7 @@ namespace Swagger.Net
             return "No Documentation Found.";
         }
 
-        public virtual string GetOperationNickname(ApiDescription apiDescription)
-        {
-            return apiDescription.ActionDescriptor.ActionName + String.Join("-",apiDescription.ParameterDescriptions.Select( pd => pd.Name));
-        }
+
 
         private XPathNavigator GetMemberNode(HttpActionDescriptor actionDescriptor)
         {

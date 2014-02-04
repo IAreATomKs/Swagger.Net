@@ -18,7 +18,6 @@ namespace Swagger.Net
         /// Create a resource listing
         /// </summary>
         /// <param name="controllerContext">Current controller context</param>
-        /// <param name="includeResourcePath">Should the resource path property be included in the response</param>
         /// <returns>A resrouce listing</returns>
         public static ApiDeclaration CreateApiDeclaration(HttpControllerContext controllerContext)
         {
@@ -69,7 +68,7 @@ namespace Swagger.Net
             var rApiOperation = new Operation()
             {
                 HttpMethod = api.HttpMethod.ToString(),
-                Nickname = docProvider.GetOperationNickname(api),
+                Nickname = api.GetNickname(),
                 Type = api.ActionDescriptor.ReturnType.GetSwaggerType(),
                 Summary = api.Documentation,
                 Notes = docProvider.GetOperationNotes(api.ActionDescriptor),
@@ -94,7 +93,7 @@ namespace Swagger.Net
                 Name = param.Name,
                 Description = param.Documentation,
                 Type = param.ParameterDescriptor.ParameterType.GetSwaggerType(),
-                Required = docProvider.GetRequired(param.ParameterDescriptor),
+                Required = !param.ParameterDescriptor.IsOptional,
                 Items = param.ParameterDescriptor.ParameterType.IsIEnumerable() ? new Items(){Type = "string"} : null 
             };
 
