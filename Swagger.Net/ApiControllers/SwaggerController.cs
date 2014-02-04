@@ -39,7 +39,7 @@ namespace Swagger.Net.ApiControllers
                     {
                         //TODO: Fix path with proper routing
                         Path = "/getapi/" + controller.ControllerName,
-                        Description = "controller.Documentation"
+                        Description = controller.
                     })
                 };
         }
