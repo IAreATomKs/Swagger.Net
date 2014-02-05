@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Swagger.Net.Models;
+using Swagger.Net.Providers.SwaggerTypeProvider;
 
 namespace Swagger.Net.Extensions
 {
@@ -22,54 +24,10 @@ namespace Swagger.Net.Extensions
             return type.GetCustomAttributes(attributeType, true).Any();
         }
 
-        public static string GetSwaggerType(this Type type)
+        public static SwaggerType GetSwaggerType(this Type type)
         {
-            if (type == null)
-            {
-                return "void";
-            }
-            if (type.IsIEnumerable())
-            {
-                return "Array";
-            }
-            //TODO: Add other format for guids
-            if (type == typeof(string) || type == typeof(Guid))
-            {
-                return "string";
-            }
-            if (type == typeof(int))
-            {
-                return "integer";
-            }
-            if (type == typeof(long))
-            {
-                return "long";
-            }
-            if (type == typeof(float))
-            {
-                return "float";
-            }
-            if (type == typeof(double) || type == typeof(decimal))
-            {
-                return "double";
-            }
-            if (type == typeof(byte))
-            {
-                return "byte";
-            }
-            if (type == typeof(bool))
-            {
-                return "boolean";
-            }
-            if (type == typeof(DateTime))
-            {
-                return "datetime";
-            }
-            if (!type.IsPrimitive())
-            {
-                return type.Name;
-            }
-            return "string";
+            var provider = new SwaggerProviderService();
+            return provider.GetSwaggerType(type);
         }
     }
 }

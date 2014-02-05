@@ -24,8 +24,9 @@ namespace Swagger.Net.WebApi.Controllers
         /// </summary>
         /// <param name="id">Id of the blogpost</param>
         /// <param name="cheese">nom nom</param>
+        /// <param name="enumTest">Please work</param>
         /// <returns></returns>
-        public string Get(int id, bool isABool = false, string cheese = "nom nom")
+        public string Get(int id, bool? isABool = false, string cheese = "nom nom", EnumTest enumTest = EnumTest.Hope)
         {
             return "value";
         }
@@ -45,5 +46,13 @@ namespace Swagger.Net.WebApi.Controllers
         public void Delete(int id)
         {
         }
+    }
+
+    public enum EnumTest
+    {
+        Hope,
+        This,
+        Is,
+        Working
     }
 }

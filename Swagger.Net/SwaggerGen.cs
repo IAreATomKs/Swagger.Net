@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -45,6 +46,7 @@ namespace Swagger.Net
         /// <returns>A resource api</returns>
         public Api CreateApi(ApiDescription api)
         {
+            var returnSwaggerType = api.ActionDescriptor.ReturnType.GetSwaggerType();
             return new Api()
             {
                 Path = "/" + api.GetCleanRelativePath(),
@@ -55,7 +57,7 @@ namespace Swagger.Net
                     {
                         HttpMethod = api.HttpMethod.ToString(),
                         Nickname = api.GetNickname(),
-                        Type = api.ActionDescriptor.ReturnType.GetSwaggerType(),
+                        Type = returnSwaggerType.Type,
                         Summary = api.Documentation,
                         Notes = _docProvider.GetOperationNotes(api.ActionDescriptor),
                         Parameters = api.ParameterDescriptions.Select(CreateParameter)
@@ -71,14 +73,17 @@ namespace Swagger.Net
         /// <returns>An operation parameter</returns>
         public Parameter CreateParameter(ApiParameterDescription param)
         {
+            var returnType = param.ParameterDescriptor.ParameterType.GetSwaggerType();
             return new Parameter()
             {
                 ParamTypeEnum = param.GetParamType(),
                 Name = param.Name,
                 Description = param.Documentation,
-                Type = param.ParameterDescriptor.ParameterType.GetSwaggerType(),
+                Type = returnType.Type,
+                Format = returnType.Format,
+                Enum = returnType.Enum,
                 Required = !param.ParameterDescriptor.IsOptional,
-                Items = param.ParameterDescriptor.ParameterType.IsIEnumerable() ? new Items(){Type = "string"} : null 
+                Items = param.ParameterDescriptor.ParameterType.IsIEnumerable() ? new Items{ Type = "string" } : null 
             };
         }
     }

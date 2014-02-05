@@ -27,6 +27,9 @@ namespace Swagger.Net.Models
         [JsonProperty(PropertyName = "type")]
         public string Type { get; set; }
 
+        [JsonProperty(PropertyName = "format")]
+        public string Format { get; set; }
+
         [JsonProperty(PropertyName = "required")]
         public bool Required { get; set; }
 
@@ -40,7 +43,7 @@ namespace Swagger.Net.Models
         public int Maximum { get; set; }
 
         [JsonProperty(PropertyName = "enum")]
-        public IEnumerable<object> Enum { get; set; }
+        public IEnumerable<string> Enum { get; set; }
 
         [JsonProperty(PropertyName = "items")]
         public Items Items { get; set; } 

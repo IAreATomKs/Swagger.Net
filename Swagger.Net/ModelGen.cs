@@ -43,10 +43,10 @@ namespace Swagger.Net
             return info.Name;
         }
 
-        private static Dictionary<string,Property> CreateProperties(Type parameterType)
+        private static Dictionary<string,SwaggerType> CreateProperties(Type parameterType)
         {
             return parameterType.GetProperties()
-                                .ToDictionary(GetPropertyName, p => new Property {Type = p.PropertyType.GetSwaggerType()});
+                                .ToDictionary(GetPropertyName, p => p.PropertyType.GetSwaggerType());
         }
     }
 }

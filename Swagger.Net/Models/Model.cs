@@ -15,6 +15,6 @@ namespace Swagger.Net.Models
         public IEnumerable<string> Required { get; set; }
 
         [JsonProperty(PropertyName = "properties")]
-        public Dictionary<string, Property> Properties { get; set; }
+        public Dictionary<string, SwaggerType> Properties { get; set; }
     }
 }
